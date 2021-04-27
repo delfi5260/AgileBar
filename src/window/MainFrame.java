@@ -73,13 +73,13 @@ public class MainFrame extends JFrame {
                 try {
                     model.setRowCount(0);
                     Scanner scanner = new Scanner(new File("src/db/base"));
-                    s=scanner.next();
+                    s=scanner.nextLine();
                     int i=0;
                     while (!s.isEmpty()){
                         model.insertRow(i, new String[]{s.split(";")[0], s.split(";")[1], s.split(";")[2],s.split(";")[3]});
                         i++;
                         try {
-                            s=scanner.next();
+                            s=scanner.nextLine();
                         }catch (Exception exception){
                             break;
                         }
