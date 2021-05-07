@@ -5,29 +5,29 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.io.*;
 import java.nio.channels.FileChannel;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Scanner;
+import java.util.*;
 
 public class MainFrame extends JFrame {
     int row = 0;
 
-    public MainFrame(int w, int h, int row, int col) throws FileNotFoundException {
+    public MainFrame(int w, int h, int row, int col) {
+        setTitle("Система лояльность");
         setSize(w,h);
         setVisible(true);
         setLayout(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         addContent(this.getContentPane(),row,col);
-
     }
 
-    private void addContent(Container pane,int row, int col) throws FileNotFoundException {
+    private void addContent(Container pane,int row, int col) {
         this.row = row;
-        JTextArea textArea = new JTextArea();
-        DefaultTableModel model = new DefaultTableModel(row,col);
+        Vector<String> columnName = new Vector<>(Arrays.asList("Номер","Имя","Суммарный счёт","Дата обновления"));
+        DefaultTableModel model = new DefaultTableModel(columnName,0);
         JTable table = new JTable(model);
-
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBounds(50,20,1000,400);
@@ -35,9 +35,9 @@ public class MainFrame extends JFrame {
         JButton buttonShowAll = new JButton("Показать все");
         buttonShowAll.setBounds(1100,30,100,40);
         pane.add(buttonShowAll);
-        JTextField textName = new JTextField("Введите имя");
-        JTextField textNumber = new JTextField("Введите номер");
-        JTextField textCount = new JTextField("Введите счет");
+        JTextField textName = createJtexField("Введите имя");
+        JTextField textNumber = createJtexField("Введите номер");
+        JTextField textCount = createJtexField("Введите счет");
         textName.setBounds(100,500,150,40);
         textNumber.setBounds(300,500,150,40);
         textCount.setBounds(500,500,150,40);
@@ -48,8 +48,8 @@ public class MainFrame extends JFrame {
         buttonAdd.setBounds(700,500,130,40);
         pane.add(buttonAdd);
 
-        JTextField textNumberForSearch = new JTextField("Введите номер");
-        JTextField textCountForSearch = new JTextField("Сумма счета");
+        JTextField textNumberForSearch = createJtexField("Введите номер");
+        JTextField textCountForSearch = createJtexField("Сумма счёта");
         JLabel labelDisc = new JLabel("Скидка");
         textNumberForSearch.setBounds(100,600,150,40);
         textCountForSearch.setBounds(500,600,150,40);
@@ -153,6 +153,28 @@ public class MainFrame extends JFrame {
             }
         });
 
+    }
+
+    public  JTextField createJtexField(String text){
+        JTextField Jtext = new JTextField(text);
+        Jtext.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+
+                if ( Jtext.getText().equals(text)){
+                    Jtext.setText(null);
+                    super.focusGained(e);
+                }
+            }
+            @Override
+            public void focusLost(FocusEvent e) {
+                if ( Jtext.getText().equals("")){
+                    Jtext.setText(text);
+                    super.focusLost(e);
+                }
+            }
+        });
+        return Jtext;
     }
 
     public int searchClient(String number) throws FileNotFoundException {
