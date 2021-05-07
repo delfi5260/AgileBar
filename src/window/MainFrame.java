@@ -1,5 +1,4 @@
 package window;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -35,36 +34,45 @@ public class MainFrame extends JFrame {
         JButton buttonShowAll = new JButton("Показать все");
         buttonShowAll.setBounds(1100,30,100,40);
         pane.add(buttonShowAll);
-        JTextField textName = createJtexField("Введите имя");
-        JTextField textNumber = createJtexField("Введите номер");
-        JTextField textCount = createJtexField("Введите счет");
-        textName.setBounds(100,500,150,40);
-        textNumber.setBounds(300,500,150,40);
-        textCount.setBounds(500,500,150,40);
+        JTextField textName = createJTexField("Введите имя");
+        JTextField textNumber = createJTexField("Введите номер");
+        JTextField textCount = createJTexField("Введите счет");
+        textName.setBounds(100,450,150,40);
+        textNumber.setBounds(300,450,150,40);
+        textCount.setBounds(500,450,150,40);
         pane.add(textName);
         pane.add(textNumber);
         pane.add(textCount);
         JButton buttonAdd = new JButton("Добавить нового");
-        buttonAdd.setBounds(700,500,130,40);
+        buttonAdd.setBounds(700,450,130,40);
         pane.add(buttonAdd);
-
-        JTextField textNumberForSearch = createJtexField("Введите номер");
-        JTextField textCountForSearch = createJtexField("Сумма счёта");
+        //        Поиск
+        JTextField textNumberForSearch = createJTexField("Введите номер");
+        JButton buttonSearch = new JButton("Найти");
+        buttonSearch.setBounds(300,515,100,40);
+        pane.add(buttonSearch);
+        JTextField textCountForSearch = createJTexField("Сумма счёта");
         JLabel labelDisc = new JLabel("Скидка");
-        textNumberForSearch.setBounds(100,600,150,40);
-        textCountForSearch.setBounds(500,600,150,40);
-        labelDisc.setBounds(420,600,100,40);
+        textNumberForSearch.setBounds(100,515,150,40);
+        textCountForSearch.setBounds(550,585,150,40);
+        labelDisc.setBounds(560,550,100,40);
         pane.add(textNumberForSearch);
         pane.add(textCountForSearch);
         pane.add(labelDisc);
-        JButton buttonSearch = new JButton("Найти");
+
+        JComboBox<String> boxSearch = new JComboBox<>();
+
+        boxSearch.setBounds(100,550,450,40);
+        boxSearch.setEditable(false);
+        boxSearch.setVisible(true);
+        pane.add(boxSearch);
+
         JButton buttonSearchAdd = new JButton("Добавить счет");
-        buttonSearch.setBounds(300,600,100,40);
-        buttonSearchAdd.setBounds(700,600,130,40);
-        pane.add(buttonSearch);
+        buttonSearchAdd.setBounds(700,585,130,40);
         pane.add(buttonSearchAdd);
         buttonSearchAdd.setVisible(false);
         textCountForSearch.setVisible(false);
+
 
         buttonShowAll.addActionListener(new ActionListener() {
             @Override
@@ -83,12 +91,10 @@ public class MainFrame extends JFrame {
                         }catch (Exception exception){
                             break;
                         }
-
                     }
                 } catch (FileNotFoundException fileNotFoundException) {
                     fileNotFoundException.printStackTrace();
                 }
-
             }
         });
 
@@ -119,13 +125,18 @@ public class MainFrame extends JFrame {
                 if(!textNumberForSearch.getText().isEmpty()){
                     try {
                         int numberString=0;
-                        numberString=searchClient(textNumberForSearch.getText());
-                        if(numberString!=-1){
-                            labelDisc.setText(searchDisc(numberString)+"%");
+                        ArrayList<String> dictClient=searchClientForDisc(textNumberForSearch.getText());
+                        boxSearch.removeAllItems();
+                        if(!dictClient.isEmpty()){
+                            for (String st :dictClient){
+                                boxSearch.addItem(st+" Скидка:"+searchDisc(Integer.parseInt(st.split(";")[0]))+"%");
+                            }
                             textCountForSearch.setVisible(true);
                             buttonSearchAdd.setVisible(true);
                         }else{
                             labelDisc.setText("Не найдено");
+                            buttonSearchAdd.setVisible(false);
+                            textCountForSearch.setVisible(false);
                         }
                     } catch (FileNotFoundException fileNotFoundException) {
                         fileNotFoundException.printStackTrace();
@@ -152,29 +163,28 @@ public class MainFrame extends JFrame {
                 }
             }
         });
-
     }
 
-    public  JTextField createJtexField(String text){
-        JTextField Jtext = new JTextField(text);
-        Jtext.addFocusListener(new FocusAdapter() {
+    public  JTextField createJTexField (String text){
+        JTextField jTextField = new JTextField(text);
+        jTextField.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
 
-                if ( Jtext.getText().equals(text)){
-                    Jtext.setText(null);
-                    super.focusGained(e);
+                if ( jTextField.getText().equals(text)){
+                    jTextField.setText(null);
+//                    super.focusGained(e);
                 }
             }
             @Override
             public void focusLost(FocusEvent e) {
-                if ( Jtext.getText().equals("")){
-                    Jtext.setText(text);
-                    super.focusLost(e);
+                if ( jTextField.getText().equals("")){
+                    jTextField.setText(text);
+//                    super.focusLost(e);
                 }
             }
         });
-        return Jtext;
+        return jTextField;
     }
 
     public int searchClient(String number) throws FileNotFoundException {
@@ -194,8 +204,27 @@ public class MainFrame extends JFrame {
                 return -1;
             }
         }
+    }
 
-
+    public ArrayList<String> searchClientForDisc (String number) throws FileNotFoundException {
+        ArrayList<String> dictClient = new ArrayList<>();
+        String s;
+        Scanner scanner = new Scanner(new File("src/db/base"));
+        s=scanner.nextLine();
+        int i=0;
+        while(!s.isEmpty()){
+            try {
+                String ass = s.split(";")[0];
+                if(ass.substring(ass.length()-4).equals(number)){
+                    dictClient.add(i+";"+s.replace(';',' '));
+                }
+                i++;
+                s=scanner.nextLine();
+            }catch (Exception exception){
+                break;
+            }
+        }
+        return dictClient;
     }
 
     public int searchDisc(int numberString) throws FileNotFoundException {
@@ -240,8 +269,6 @@ public class MainFrame extends JFrame {
                 break;
             }
         }
-
-
     }
 
     private static void copyFileUsingChannel(File source, File dest) throws IOException {
@@ -256,5 +283,4 @@ public class MainFrame extends JFrame {
             destChannel.close();
         }
     }
-
 }
