@@ -38,7 +38,7 @@ public class MainFrame extends JFrame {
         this.add(scrollPane);
 
         JButton buttonShowAll = new JButton("Показать все");
-        buttonShowAll.setBounds(1100,30,100,40);
+        buttonShowAll.setBounds(1100,30,120,40);
         pane.add(buttonShowAll);
 
 /*  Блок добавления записи ***************/
@@ -64,7 +64,7 @@ public class MainFrame extends JFrame {
         pane.add(textCount);
 
         JButton buttonAdd = new JButton("Добавить нового");
-        buttonAdd.setBounds(700,450,130,40);
+        buttonAdd.setBounds(700,450,150,40);
         pane.add(buttonAdd);
 
 /*  Поиск ***************/
