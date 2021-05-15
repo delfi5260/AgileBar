@@ -167,6 +167,10 @@ public class MainFrame extends JFrame {
                                 fw.close();
                                 model.insertRow(row, new String[]{textNumber.getText(), textName.getText(), textCount.getText(), date,date + "-" + textCount.getText()});
                                 triggerInfoMessage("Гость добавлен", JOptionPane.INFORMATION_MESSAGE);
+                                textName.setText("");
+                                textNumber.setText("");
+                                textCount.setText("");
+
                             } else {
                                 triggerInfoMessage("Этот номер уже существует",JOptionPane.WARNING_MESSAGE);
                             }
