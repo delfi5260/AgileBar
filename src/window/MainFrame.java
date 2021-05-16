@@ -157,7 +157,7 @@ public class MainFrame extends JFrame {
                             if (searchClient(textNumber.getText()) == -1) {
                                 FileWriter fw = new FileWriter("src/db/base", true);
                                 Calendar calendar = new GregorianCalendar();
-                                String date = calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "." + calendar.get(Calendar.YEAR);
+                                String date = calendar.get(Calendar.DAY_OF_MONTH) + "." + (calendar.get(Calendar.MONTH)+1) + "." + calendar.get(Calendar.YEAR);
                                 fw.write(textNumber.getText() + ";"
                                         + textName.getText() + ";"
                                         + textCount.getText() + ";"
@@ -345,8 +345,8 @@ public class MainFrame extends JFrame {
         String s = scanner.nextLine();
         int count = sum +Integer.parseInt(s.split(";")[2]);
         Calendar calendar = new GregorianCalendar();
-        String data = calendar.get(Calendar.DAY_OF_MONTH)+"."+calendar.get(Calendar.MONTH)+"."+calendar.get(Calendar.YEAR);
-        s=s.split(";")[0]+";"+s.split(";")[1]+";"+count+";"+data+";"+s.split(";")[4]+"@"+data+"-"+count+"\n";
+        String data = calendar.get(Calendar.DAY_OF_MONTH)+"."+(calendar.get(Calendar.MONTH)+1)+"."+calendar.get(Calendar.YEAR);
+        s=s.split(";")[0]+";"+s.split(";")[1]+";"+count+";"+data+";"+s.split(";")[4]+"@"+data+"-"+sum+"\n";
         fw.write(s);
         while(true){
             try {
