@@ -8,6 +8,7 @@ public class DigitFilter extends DocumentFilter {
         switch (type){
 //            case 0: this.DIGITS="\\d+"; break;
             case 0: this.DIGITS="[0-9 ]"; break;
+            case 2: this.DIGITS="[0-9 [А-я A-z] ,-]"; break;
             default: this.DIGITS="(.*)[А-я A-z](.*)";
         }
     }

@@ -43,29 +43,38 @@ public class MainFrame extends JFrame {
 
 /*  Блок добавления записи ***************/
         JLabel labelName = new JLabel("Имя");
-        labelName.setBounds(105,420,150,40);
+        labelName.setBounds(85,420,150,40);
         pane.add(labelName);
         JTextField textName = createJTexField("Введите имя",1);
-        textName.setBounds(100,450,150,40);
+        textName.setBounds(80,450,150,40);
         pane.add(textName);
 
         JLabel labelNumber = new JLabel("Номер телефона");
-        labelNumber.setBounds(305,420,150,40);
+        labelNumber.setBounds(255,420,150,40);
         pane.add(labelNumber);
         JTextField textNumber = createJTexField(null,0);
-        textNumber.setBounds(300,450,150,40);
+        textNumber.setBounds(250,450,150,40);
         pane.add(textNumber);
 
         JLabel labelCount = new JLabel("Счёт");
-        labelCount.setBounds(505,420,150,40);
+        labelCount.setBounds(425,420,150,40);
         pane.add(labelCount);
         JTextField textCount = createJTexField(null,0);
-        textCount.setBounds(500,450,150,40);
+        textCount.setBounds(420,450,150,40);
         pane.add(textCount);
 
         JButton buttonAdd = new JButton("Добавить нового");
-        buttonAdd.setBounds(700,450,150,40);
+        buttonAdd.setBounds(870,450,150,40);
         pane.add(buttonAdd);
+
+        JLabel commLable = new JLabel("Комментарий");
+        commLable.setBounds(590,419,150,40);
+        pane.add(commLable);
+        JTextArea textComm = createTextArea("Что заказывали?",2);
+        textComm.setBounds(590,450,250,50);
+        textComm.setPreferredSize(new Dimension(250, 50));
+        textComm.setLineWrap(true);
+        pane.add(textComm);
 
 /*  Поиск ***************/
         JLabel labelNumberForSearch = new JLabel("Последние 4 цифры телефона");
@@ -90,7 +99,7 @@ public class MainFrame extends JFrame {
         pane.add(labelDisc);
 
         JLabel labelCountForSearch = new JLabel("Сумма счёта");
-        labelCountForSearch.setBounds(555,580,150,40);
+        labelCountForSearch.setBounds(555,580,100,40);
         pane.add(labelCountForSearch);
         labelCountForSearch.setVisible(false);
 
@@ -99,8 +108,19 @@ public class MainFrame extends JFrame {
         pane.add(textCountForSearch);
         textCountForSearch.setVisible(false);
 
+        JLabel commLableAdd = new JLabel("Комментарий");
+        commLableAdd.setBounds(710,565,150,40);
+        pane.add(commLableAdd);
+        commLableAdd.setVisible(false);
+        JTextArea textCommAdd = createTextArea("Что заказывали?",2);
+        textCommAdd.setBounds(710,597,250,50);
+        textCommAdd.setPreferredSize(new Dimension(250, 50));
+        textCommAdd.setLineWrap(true);
+        textCommAdd.setVisible(false);
+        pane.add(textCommAdd);
+
         JButton buttonSearchAdd = new JButton("Добавить счет");
-        buttonSearchAdd.setBounds(700,610,130,40);
+        buttonSearchAdd.setBounds(710,650,130,40);
         pane.add(buttonSearchAdd);
         buttonSearchAdd.setVisible(false);
 
@@ -162,7 +182,8 @@ public class MainFrame extends JFrame {
                                         + textName.getText() + ";"
                                         + textCount.getText() + ";"
                                         + date + ";"
-                                        + date + "-" + textCount.getText()
+                                        + date + "-" + textCount.getText()+";"
+                                        + textCount.getText()+":"+textComm.getText()+";"
                                         + "\n");
                                 fw.close();
                                 model.insertRow(row, new String[]{textNumber.getText(), textName.getText(), textCount.getText(), date,date + "-" + textCount.getText()});
@@ -203,11 +224,15 @@ public class MainFrame extends JFrame {
                             textCountForSearch.setVisible(true);
                             buttonSearchAdd.setVisible(true);
                             labelCountForSearch.setVisible(true);
+                            textCommAdd.setVisible(true);
+                            commLableAdd.setVisible(true);
                         }else{
                             labelDisc.setText("Не найдено");
                             buttonSearchAdd.setVisible(false);
                             textCountForSearch.setVisible(false);
                             labelCountForSearch.setVisible(false);
+                            textCommAdd.setVisible(false);
+                            commLableAdd.setVisible(false);
                         }
                     } catch (FileNotFoundException fileNotFoundException) {
                         fileNotFoundException.printStackTrace();
@@ -225,10 +250,12 @@ public class MainFrame extends JFrame {
                     try {
                         String st = (String) boxSearch.getSelectedItem();
                         int numberString = Integer.parseInt(st.split(";")[0].trim());
-                        rewriteBase(numberString,Integer.parseInt(textCountForSearch.getText()));
+                        rewriteBase(numberString,Integer.parseInt(textCountForSearch.getText()),textCommAdd.getText());
                         buttonSearchAdd.setVisible(false);
                         textCountForSearch.setVisible(false);
                         labelCountForSearch.setVisible(false);
+                        textCommAdd.setVisible(false);
+                        commLableAdd.setVisible(false);
                         labelDisc.setText("Добавлено");
                         boxSearch.removeAllItems();
                         textCountForSearch.setText("");
@@ -266,6 +293,30 @@ public class MainFrame extends JFrame {
 //            }
         });
         return jTextField;
+    }
+
+    public  JTextArea createTextArea (String text,int type){
+        JTextArea TextArea = new JTextArea(text);
+        PlainDocument doc = (PlainDocument) TextArea.getDocument();
+        doc.setDocumentFilter(new DigitFilter(type));
+
+        TextArea.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if ( TextArea.getText().equals(text)){
+                    TextArea.setText("");
+                }
+
+            }
+//            @Override
+//            public void focusLost(FocusEvent e) {
+//                if ( jTextField.getText().equals("")){
+//                    jTextField.setText(text);
+////                    super.focusLost(e);
+//                }
+//            }
+        });
+        return TextArea;
     }
 
     public void triggerInfoMessage(String strInginfoMessage, int type) {
@@ -333,7 +384,7 @@ public class MainFrame extends JFrame {
         }
     }
 
-    public void rewriteBase(int numberString, int sum) throws IOException {
+    public void rewriteBase(int numberString, int sum,String comment) throws IOException {
         copyFileUsingChannel(new File("src/db/base"),new File("src/db/baseTmp"));
         Scanner scanner = new Scanner(new File("src/db/baseTmp"));
         FileWriter fw = new FileWriter("src/db/base");
@@ -346,7 +397,17 @@ public class MainFrame extends JFrame {
         int count = sum +Integer.parseInt(s.split(";")[2]);
         Calendar calendar = new GregorianCalendar();
         String data = calendar.get(Calendar.DAY_OF_MONTH)+"."+(calendar.get(Calendar.MONTH)+1)+"."+calendar.get(Calendar.YEAR);
-        s=s.split(";")[0]+";"+s.split(";")[1]+";"+count+";"+data+";"+s.split(";")[4]+"@"+data+"-"+sum+"\n";
+        String oldComment="";
+        if(s.split(";").length>5){
+            oldComment=s.split(";")[5];
+        }
+
+        s=        s.split(";")[0] + ";"
+                + s.split(";")[1] + ";"
+                + count+";" + data + ";"
+                + s.split(";")[4] + "@" + data + "-" + sum +";"
+                + oldComment + "@" + sum + ":" + comment+";"
+                +"\n";
         fw.write(s);
         while(true){
             try {
