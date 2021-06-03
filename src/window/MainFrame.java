@@ -191,6 +191,7 @@ public class MainFrame extends JFrame {
                                 textName.setText("");
                                 textNumber.setText("");
                                 textCount.setText("");
+                                textComm.setText("");
 
                             } else {
                                 triggerInfoMessage("Этот номер уже существует",JOptionPane.WARNING_MESSAGE);
@@ -259,6 +260,7 @@ public class MainFrame extends JFrame {
                         labelDisc.setText("Добавлено");
                         boxSearch.removeAllItems();
                         textCountForSearch.setText("");
+                        textCommAdd.setText("");
                         triggerInfoMessage("Общий счет обновлен",JOptionPane.INFORMATION_MESSAGE);
                     } catch (IOException fileNotFoundException) {
                         fileNotFoundException.printStackTrace();
